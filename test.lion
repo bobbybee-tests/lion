@@ -3,7 +3,7 @@ class Cat : Sprite {
   int catType;
 
   void meow() {
-    playSound(meow);
+    playSound("meow");
   };
 
   void talk(string phrase);

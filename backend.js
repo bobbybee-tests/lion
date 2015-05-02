@@ -82,14 +82,31 @@ function compileBody(body) {
   var output = [];
 
   body.forEach(function(line) {
-    if(line[0] == "declaration") {
-      // TODO: declaration
-    } else {
-      die("Unknown body line type "+line[0]);
+    if(line && line[0]) {
+      if(line[0] == "declaration") {
+        // TODO: declaration
+      } else if(line[0] == "call") {
+        // TODO: function calls
+        output.push(compileFunctionCall(line));
+      } else {
+        die("Unknown body line type "+line[0]);
+      }
     }
   });
 
   return output;
+}
+
+function compileFunctionCall(call) {
+  // TODO: proper Sprite and Stage inheritance
+
+  if(call[1] == "playSound") {
+    console.log(call[2][0][0]);
+    return ["playSound:", call[2][0][0]];
+  }
+
+  // TODO: implement function calls
+  die("Actual function calls are TODO");
 }
 
 function die(message) {
