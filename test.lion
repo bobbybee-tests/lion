@@ -2,6 +2,10 @@ class Cat : Sprite {
   string meowSound;
   int catType;
 
+  void playSound(string sound) {
+    __asm__("['playSound:', ['getParam', 'sound']]");
+  };
+
   void meow() {
     playSound("meow");
   };

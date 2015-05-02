@@ -5,6 +5,7 @@
 var $Class = require("./$Class");
 var $Type = require("./$Type");
 
+var functionLookup = {};
 var classLookup = {};
 
 // interface to code generation
@@ -27,7 +28,7 @@ module.exports = function(meow, ast) {
               // TODO: implement
               console.log(bit);
             } else if(bit[0] == "function") {
-              meow.addScript(compileFunction(bit));
+              meow.addScript(compileFunction(global[1], bit));
             } else {
               die("Unknown bit type "+bit[0]);
             }
@@ -59,13 +60,28 @@ function newObject($class) {
   return output;
 }
 
-function compileFunction(functionSpec) {
+function calcBlockSpec(prefix, functionName, paramCount) {
+  return prefix +
+          "::" +
+          functionName +
+          (Array(paramCount+1)).join(" %s");
+}
+
+function compileFunction(prefix, functionSpec) {
   // TODO: parameters to functions
   // TODO: mangling names
 
-  var blockSpec = functionSpec[2];
+  var blockSpec = prefix + "::" + functionSpec[2];
   var paramNames = [];
   var defaults = [];
+
+  functionSpec[3].forEach(function(p) {
+    if(p) {
+      paramNames.push(p);
+      defaults.push("");
+      blockSpec += " %s";
+    }
+  });
 
   var atomic = false;
 
@@ -73,12 +89,14 @@ function compileFunction(functionSpec) {
     ["procDef", blockSpec, paramNames, defaults, atomic]
   ]
 
-  output = output.concat(compileBody(functionSpec[4]));
+  output = output.concat(compileBody(functionSpec[4], prefix));
+
+  console.log(functionSpec);
 
   return output;
 }
 
-function compileBody(body) {
+function compileBody(body, currentClass) {
   var output = [];
 
   body.forEach(function(line) {
@@ -87,7 +105,7 @@ function compileBody(body) {
         // TODO: declaration
       } else if(line[0] == "call") {
         // TODO: function calls
-        output.push(compileFunctionCall(line));
+        output.push(compileFunctionCall(currentClass, line));
       } else {
         die("Unknown body line type "+line[0]);
       }
@@ -97,16 +115,19 @@ function compileBody(body) {
   return output;
 }
 
-function compileFunctionCall(call) {
+function compileFunctionCall(prefix, call) {
   // TODO: proper Sprite and Stage inheritance
 
-  if(call[1] == "playSound") {
-    console.log(call[2][0][0]);
-    return ["playSound:", call[2][0][0]];
-  }
+  //if(call[1] == "playSound") {
+  //  return ["playSound:", call[2][0]];
+  //}
 
   // TODO: implement function calls
-  die("Actual function calls are TODO");
+  // atm, this breaks for nonatomic types, return values, etc.
+
+  var blockSpec = calcBlockSpec(prefix, call[1], call[2].length);
+
+  return ["call", blockSpec].concat(call[2]);
 }
 
 function die(message) {

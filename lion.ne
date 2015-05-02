@@ -55,7 +55,7 @@ FunctionCall -> FunctionName "(" TypelessParameterList ")" {%
                 %}
 TypelessParameterList -> _ |
                         TypelessParameter |
-                        TypelessParemeterList "," _ TypelessParameter {% dsconcat %}
+                        TypelessParameterList "," _ TypelessParameter {% dsconcat %}
 TypelessParameter -> Value {% id %}
 
 FunctionName -> SingleWord {% id %}
