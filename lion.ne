@@ -20,7 +20,12 @@ GlobalLine -> ClassDeclaration _ {% id %}
 ClassName -> SingleWord {% id %}
 ClassDeclaration -> "class " ClassName _ "{" ClassBody "}" {%
                     function(d) {
-                      return ["class", d[1], d[4]];
+                      return ["class", d[1], null, d[4]];
+                    }
+                  %} |
+                  "class " ClassName " :" _ ClassName _ "{" ClassBody "}" {%
+                    function(d) {
+                      return ["class", d[1], d[4], d[7]];
                     }
                   %}
 ClassBodyLine -> Declaration _ {% id %}
