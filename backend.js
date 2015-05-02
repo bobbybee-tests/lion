@@ -5,6 +5,41 @@
 var $Class = require("./$Class");
 var $Type = require("./$Type");
 
+var classLookup = {};
+
+// interface to code generation
+module.exports = function(meow, ast) {
+
+  ast.forEach(function(global) {
+    console.log(global);
+    if(global[0] == "class") {
+      // TODO: functions, short + long
+
+      var propertyList = [];
+
+      global[3].forEach(function(bit) {
+          if(bit) {
+            if(bit[0] == "declaration") {
+              propertyList.push([new $Type(bit[1]), bit[2]]);
+
+              // TODO: initialization values
+            } else if(bit[0] == "shortfunction") {
+              // TODO: implement
+              console.log(bit);
+            } else {
+              die("Unknown bit type "+bit[0]);
+            }
+          }
+      });
+
+      // TODO: inheritance
+      classLookup[global[1]] = new $Class(global[1], propertyList);
+    } else {
+      die("Unknown global command" + global[0])
+    }
+  })
+}
+
 // generates Scratch blocks for object instantiation of $class
 
 // TODO: constructors
@@ -22,17 +57,7 @@ function newObject($class) {
   return output;
 }
 
-// actual interface to code generation
-// TODO: actually do code generation here
-module.exports = function(meow, ast) {
-  // serialization test
-  var Foo = new $Class("Foo", [
-    [new $Type("int"), "foo"],
-    [new $Type("float"), "bar"],
-    [new $Type("string"), "baz"]
-  ])
-
-  meow.addScript(newObject(Foo));
-
-  console.log(ast);
+function die(message) {
+  console.error(message);
+  process.exit(-1);
 }
