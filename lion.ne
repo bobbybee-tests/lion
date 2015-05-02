@@ -30,6 +30,7 @@ ClassDeclaration -> "class " ClassName _ "{" ClassBody "}" {%
                   %}
 ClassBodyLine -> Declaration _ {% id %}
                 | ShortFunctionDeclaration _ {% id %}
+                | FunctionDeclaration _ {% id %}
 
 ClassBody ->  _ |
               ClassBodyLine |
@@ -58,6 +59,18 @@ ShortFunctionDeclaration -> TypeName " " FunctionName "(" ParameterList ")" ";" 
                               return ["shortfunction", d[0], d[2], d[4]];
                             }
                           %}
+FunctionDeclaration -> TypeName " " FunctionName "(" ParameterList ")" _ "{" FunctionBody "}" _ ";" {%
+                        function(d) {
+                          return ["function", d[0], d[2], d[4], d[8]]
+                        }
+                      %}
+FunctionBody -> Block {% id %}
+
+Block -> _ |
+        BlockLine |
+        Block BlockLine
+
+BlockLine -> Declaration _ {% id %}
 
 AtomicType -> "int" | "string" | "float" | "void"
 TypeName -> AtomicType {% doubleid %}

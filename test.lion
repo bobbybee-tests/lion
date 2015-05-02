@@ -2,6 +2,9 @@ class Cat : Sprite {
   string meowSound;
   int catType;
 
-  void meow();
+  void meow() {
+    int hello;
+  };
+
   void talk(string phrase);
 }
