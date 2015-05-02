@@ -82,9 +82,12 @@ Block -> _ |
 
 BlockLine -> Declaration _ {% id %}
             | FunctionCall ";" _ {% id %}
+            | ASM ";" _ {% id %}
 
 AtomicType -> "int" | "string" | "float" | "void"
 TypeName -> AtomicType {% doubleid %}
+
+ASM -> "__asm__(" String ")" {% function(d) { return ["asm", d[1]]} %}
 
 # define some axioms here
 
@@ -100,5 +103,6 @@ SingleWord -> [A-Za-z] {% id %}
 Value -> SingleWord {% id %}
         | String {% id %}
 String -> "\"" StringValue "\"" {% function(d) { return d[1] } %}
-StringValue -> [A-Za-z0-9 ] {% id %}
-              | StringValue [A-Za-z0-9 ] {% function(d) { return d[0] + d[1]; } %}
+StringValue -> [A-Za-z0-9 [\]':,] {% id %}
+              | StringValue [A-Za-z0-9 [\]':,] {% function(d) { return d[0] + d[1]; } %}
+              | StringValue "\\\"" {% function(d) { return d[0] + "\""} %}

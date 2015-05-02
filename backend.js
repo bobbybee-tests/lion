@@ -106,6 +106,8 @@ function compileBody(body, currentClass) {
       } else if(line[0] == "call") {
         // TODO: function calls
         output.push(compileFunctionCall(currentClass, line));
+      } else if(line[0] == "asm") {
+        output.push(JSON.parse(line[1]));
       } else {
         die("Unknown body line type "+line[0]);
       }
