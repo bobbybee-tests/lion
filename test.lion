@@ -1,0 +1,7 @@
+class Cat : Sprite {
+  string meowSound;
+  int catType;
+
+  void meow();
+  void talk(string phrase);
+}
