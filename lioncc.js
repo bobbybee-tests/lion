@@ -5,8 +5,6 @@ var ListTuple = $meow.ListTuple;
 var memory = new ListTuple("$Memory");
 meow.lists.push(memory);
 
-meow.upload(process.argv[3], 'v426', process.argv[4], process.argv[5]);
-
 function $Type(string) {
   this.string = string;
 }
@@ -20,9 +18,15 @@ $Type.prototype.default = function() {
     case "int": {
       return 0;
     }
+
     case "float": {
       return "0.0";
     }
+
+    case "string": {
+      return "";
+    }
+
     default: {
       console.log("Unknown default for "+this.toString());
       return 0;
@@ -45,8 +49,20 @@ function newObject($class) {
   ];
 
   $class.properties.forEach(function(property) {
+    console.log(property[0].toString());
     output.push(["insert:at:ofList:", property[0].default(), "last", "$Memory"])
   });
 
   return output;
 }
+
+// serialization test
+var Foo = new $Class("Foo", [
+  [new $Type("int"), "foo"],
+  [new $Type("float"), "bar"],
+  [new $Type("string"), "baz"]
+])
+
+meow.addScript(newObject(Foo));
+
+meow.upload(process.argv[3], 'v426', process.argv[4], process.argv[5]);
