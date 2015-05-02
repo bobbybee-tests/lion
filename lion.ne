@@ -4,10 +4,16 @@
   }
 %}
 
+@{%
+  function dsconcat(d) {
+    return d[0].concat([d[1]]);
+  }
+%}
+
 main -> program {% id %}
 
 program -> GlobalLine
-          | program GlobalLine {% function(d) { return d[0].concat([d[1]]) } %}
+          | program GlobalLine {% dsconcat %}
 
 GlobalLine -> ClassDeclaration _ {% id %}
 
@@ -18,9 +24,11 @@ ClassDeclaration -> "class " ClassName _ "{" ClassBody "}" {%
                     }
                   %}
 ClassBodyLine -> Declaration _ {% id %}
+                | ShortFunctionDeclaration _ {% id %}
+
 ClassBody ->  _ |
               ClassBodyLine |
-              ClassBody ClassBodyLine {% function(d) { return d[0].concat([d[1]])} %}
+              ClassBody ClassBodyLine {% dsconcat %}
 
 VariableName -> SingleWord {% id %}
 Declaration -> TypeName " " VariableName ";" {%
@@ -34,7 +42,19 @@ Declaration -> TypeName " " VariableName ";" {%
                 }
               %}
 
-AtomicType -> "int" | "string" | "float"
+FunctionName -> SingleWord {% id %}
+ParameterList -> _ |
+                Parameter |
+                ParameterList "," _ Parameter {% dsconcat %}
+Parameter -> TypeName " " VariableName {% function(d) { return d[0], d[2] } %}
+
+ShortFunctionDeclaration -> TypeName " " FunctionName "(" ParameterList ")" ";" {%
+                            function(d) {
+                              return ["shortfunction", d[0], d[2], d[4]];
+                            }
+                          %}
+
+AtomicType -> "int" | "string" | "float" | "void"
 TypeName -> AtomicType {% doubleid %}
 
 # define some axioms here
