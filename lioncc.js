@@ -35,6 +35,18 @@ function $Class(name, properties) {
   this.properties = properties;
 }
 
+// generates Scratch blocks for object instantiation of $class
+// TODO: constructors
+
 function newObject($class) {
-  console.log($class);
+  var output = [
+    ["insert:at:ofList:", 100, "last", "$Memory"],
+    ["insert:at:ofList:", $class.properties.length, "last", "$Memory"],
+  ];
+
+  $class.properties.forEach(function(property) {
+    output.push(["insert:at:ofList:", property[0].default(), "last", "$Memory"])
+  });
+
+  return output;
 }
