@@ -26,6 +26,8 @@ module.exports = function(meow, ast) {
             } else if(bit[0] == "shortfunction") {
               // TODO: implement
               console.log(bit);
+            } else if(bit[0] == "function") {
+              meow.addScript(compileFunction(bit));
             } else {
               die("Unknown bit type "+bit[0]);
             }
@@ -52,6 +54,39 @@ function newObject($class) {
   $class.properties.forEach(function(property) {
     console.log(property[0].toString());
     output.push(["insert:at:ofList:", property[0].default(), "last", "$Memory"])
+  });
+
+  return output;
+}
+
+function compileFunction(functionSpec) {
+  // TODO: parameters to functions
+  // TODO: mangling names
+
+  var blockSpec = functionSpec[2];
+  var paramNames = [];
+  var defaults = [];
+
+  var atomic = false;
+
+  var output = [
+    ["procDef", blockSpec, paramNames, defaults, atomic]
+  ]
+
+  output = output.concat(compileBody(functionSpec[4]));
+
+  return output;
+}
+
+function compileBody(body) {
+  var output = [];
+
+  body.forEach(function(line) {
+    if(line[0] == "declaration") {
+      // TODO: declaration
+    } else {
+      die("Unknown body line type "+line[0]);
+    }
   });
 
   return output;
