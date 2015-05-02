@@ -1,10 +1,12 @@
-class Cat : Sprite {
-  string meowSound;
-  int catType;
-
+class Sprite {
   void playSound(string sound) {
     __asm__("[\"playSound:\", [\"getParam\", \"sound\"]]");
   };
+}
+
+class Cat : Sprite {
+  string meowSound;
+  int catType;
 
   void meow() {
     playSound("meow");
