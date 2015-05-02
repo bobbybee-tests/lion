@@ -24,7 +24,7 @@ function newObject($class) {
 
 // actual interface to code generation
 // TODO: actually do code generation here
-module.exports = function(meow) {
+module.exports = function(meow, ast) {
   // serialization test
   var Foo = new $Class("Foo", [
     [new $Type("int"), "foo"],
@@ -33,4 +33,6 @@ module.exports = function(meow) {
   ])
 
   meow.addScript(newObject(Foo));
+
+  console.log(ast);
 }
