@@ -6,7 +6,7 @@
 
 @{%
   function dsconcat(d) {
-    return d[0].concat([d[1]]);
+    return d[0].concat([d[d.length - 1]]);
   }
 %}
 
@@ -48,6 +48,16 @@ Declaration -> TypeName " " VariableName ";" {%
                 }
               %}
 
+FunctionCall -> FunctionName "(" TypelessParameterList ")" {%
+                  function(d) {
+                    return ["call", d[0], d[2]]
+                  }
+                %}
+TypelessParameterList -> _ |
+                        TypelessParameter |
+                        TypelessParemeterList "," _ TypelessParameter {% dsconcat %}
+TypelessParameter -> Value {% id %}
+
 FunctionName -> SingleWord {% id %}
 ParameterList -> _ |
                 Parameter |
@@ -71,6 +81,7 @@ Block -> _ |
         Block BlockLine
 
 BlockLine -> Declaration _ {% id %}
+            | FunctionCall ";" _ {% id %}
 
 AtomicType -> "int" | "string" | "float" | "void"
 TypeName -> AtomicType {% doubleid %}
@@ -84,3 +95,10 @@ _ -> null {% function(d) { return null } %}
 # SingleWord is exactly that
 SingleWord -> [A-Za-z] {% id %}
             | SingleWord [A-Za-z0-9] {% function(d) { return d[0] + "" + d[1]; } %}
+
+# TODO: arithmetic, etc.
+Value -> SingleWord {% id %}
+        | String {% id %}
+String -> "\"" StringValue "\"" {% function(d) { return d[1] } %}
+StringValue -> [A-Za-z0-9 ] {% id %}
+              | StringValue [A-Za-z0-9 ] {% function(d) { return d[0] + d[1]; } %}
