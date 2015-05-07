@@ -73,8 +73,13 @@ Meow.prototype.upload = function(projectID, version, csrf, sessionsid) {
 	req.end();
 }
 
-Meow.prototype.addScript = function(blocks) {
-	this.scripts.push(new ScriptTuple(blocks, 0, 0));
+Meow.prototype.addScript = function(blocks, context) {
+	var tuple = new ScriptTuple(blocks, 0, 0);
+
+	if(context == "Stage" || !context)
+		this.scripts.push(tuple);
+	else
+		this.sprites[this.spriteKeys[context]].scripts.push(tuple);
 }
 
 Meow.prototype.addList = function(name) {
@@ -95,6 +100,7 @@ Meow.prototype.addSprite = function(id) {
 		visible: true,
 		spriteInfo: {},
 		sounds: [],
+		scripts: [],
 		costumes: [{
                     "costumeName": "costume1",
                     "baseLayerID": 1,

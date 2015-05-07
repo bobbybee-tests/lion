@@ -8,7 +8,7 @@ class Sprite {
   };
 }
 
-class Cat : Sprite {
+class MyCat : Sprite {
   string meowSound;
   int catType;
 

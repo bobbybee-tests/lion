@@ -21,6 +21,23 @@ module.exports = function(meow, ast) {
         className: global[1],
         inheritance: global[2],
         functionDefs: [],
+        isSprite: global[2] == "Sprite"
+      }
+
+      // if the parent is a sprite, so are we
+      // if we are a base sprite, then we're obviously a sprite
+
+      if(!prefix.isSprite) {
+        if(prefix.inheritance) {
+          if(classLookup[inheritance].isSprite) {
+            prefix.isSprite = true;
+          }
+        }
+      }
+
+      if(prefix.isSprite) {
+        // sprite classes need to be sprite
+        meow.addSprite(prefix.className);
       }
 
       global[3].forEach(function(bit) {
@@ -190,7 +207,7 @@ function compileFunctionCall(prefix, call) {
   if(call[2][0] == null) {
     call[2] = [];
   }
-  
+
   var blockSpec = calcBlockSpec(blockName, call[1], call[2].length);
 
   return ["call", blockSpec].concat(call[2]);
