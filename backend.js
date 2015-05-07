@@ -16,6 +16,7 @@ module.exports = function(meow, ast) {
     if(global[0] == "class") {
       // TODO: functions, short + long
 
+      var dependencies = [];
       var propertyList = [];
       var prefix = {
         className: global[1],
@@ -29,10 +30,14 @@ module.exports = function(meow, ast) {
 
       if(!prefix.isSprite) {
         if(prefix.inheritance) {
-          if(classLookup[inheritance].isSprite) {
+          if(classLookup[prefix.inheritance].isSprite) {
             prefix.isSprite = true;
           }
         }
+      }
+
+      if(prefix.inheritance) {
+        dependencies = classLookup[prefix.inheritance].dependencies;
       }
 
       var sb2context = "Stage";
@@ -41,6 +46,10 @@ module.exports = function(meow, ast) {
         // sprite classes need to be sprite
         meow.addSprite(prefix.className);
         sb2context = prefix.className;
+
+        dependencies.forEach(function(dependency) {
+          meow.addScript(dependency, sb2context);
+        })
       }
 
       global[3].forEach(function(bit) {
@@ -63,7 +72,9 @@ module.exports = function(meow, ast) {
                 return: bit[1]
               });
 
-              meow.addScript(compileFunction(prefix, bit), sb2context);
+              var codeOutput = compileFunction(prefix, bit);
+              dependencies.push(codeOutput);
+              meow.addScript(codeOutput, sb2context);
             } else {
               die("Unknown bit type "+bit[0]);
             }
@@ -71,7 +82,12 @@ module.exports = function(meow, ast) {
       });
 
       // TODO: inheritance
-      classLookup[global[1]] = new $Class(global[1], propertyList);
+      classLookup[global[1]] =
+                        new $Class(global[1],
+                                  propertyList,
+                                  prefix.inheritance,
+                                  prefix.isSprite,
+                                  dependencies);
     } else {
       die("Unknown global command" + global[0])
     }
