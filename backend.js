@@ -18,11 +18,13 @@ module.exports = function(meow, ast) {
 
       var dependencies = [];
       var propertyList = [];
+      var heapLength = 0;
       var prefix = {
         className: global[1],
         inheritance: global[2],
         functionDefs: [],
-        isSprite: global[2] == "Sprite"
+        isSprite: global[2] == "Sprite",
+        staticSprite: false
       }
 
       // if the parent is a sprite, so are we
@@ -56,6 +58,7 @@ module.exports = function(meow, ast) {
           if(bit) {
             if(bit[0] == "declaration") {
               propertyList.push([new $Type(bit[1]), bit[2]]);
+              heapLength++;
 
               // TODO: initialization values
             } else if(bit[0] == "shortfunction") {
@@ -75,6 +78,11 @@ module.exports = function(meow, ast) {
               var codeOutput = compileFunction(prefix, bit);
               dependencies.push(codeOutput);
               meow.addScript(codeOutput, sb2context);
+            } else if(bit[0] == "@staticsprite") {
+              // static sprites are special classes inheriting from Sprite,
+              // instantiating themselves when the green flag is clicked
+
+              prefix.staticSprite = true;
             } else {
               die("Unknown bit type "+bit[0]);
             }
@@ -87,7 +95,15 @@ module.exports = function(meow, ast) {
                                   propertyList,
                                   prefix.inheritance,
                                   prefix.isSprite,
-                                  dependencies);
+                                  dependencies,
+                                  heapLength);
+
+      if(prefix.staticSprite) {
+        meow.addScript(
+          [["whenGreenFlag"]].concat(
+            newObject(classLookup[global[1]])
+          ), global[1]);
+      }
     } else {
       die("Unknown global command" + global[0])
     }
@@ -100,13 +116,17 @@ module.exports = function(meow, ast) {
 function newObject($class) {
   var output = [
     ["insert:at:ofList:", 100, "last", "$Memory"],
-    ["insert:at:ofList:", $class.properties.length, "last", "$Memory"],
+    ["insert:at:ofList:", $class.heapLength, "last", "$Memory"],
   ];
 
   $class.properties.forEach(function(property) {
-    console.log(property[0].toString());
-    output.push(["insert:at:ofList:", property[0].default(), "last", "$Memory"])
+    if(Array.isArray(property)) {
+      console.log(property[0]);
+      output.push(["insert:at:ofList:", property[0].default(), "last", "$Memory"])
+    }
   });
+
+  console.log(output);
 
   return output;
 }

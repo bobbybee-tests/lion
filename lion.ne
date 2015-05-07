@@ -31,6 +31,7 @@ ClassDeclaration -> "class " ClassName _ "{" ClassBody "}" {%
 ClassBodyLine -> Declaration _ {% id %}
                 | ShortFunctionDeclaration _ {% id %}
                 | FunctionDeclaration _ {% id %}
+                | "@staticsprite" _
 
 ClassBody ->  _ |
               ClassBodyLine |

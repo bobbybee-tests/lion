@@ -9,6 +9,8 @@ class Sprite {
 }
 
 class MyCat : Sprite {
+  @staticsprite
+
   string meowSound;
   int catType;
 
