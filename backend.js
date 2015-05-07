@@ -35,9 +35,12 @@ module.exports = function(meow, ast) {
         }
       }
 
+      var sb2context = "Stage";
+
       if(prefix.isSprite) {
         // sprite classes need to be sprite
         meow.addSprite(prefix.className);
+        sb2context = prefix.className;
       }
 
       global[3].forEach(function(bit) {
@@ -60,7 +63,7 @@ module.exports = function(meow, ast) {
                 return: bit[1]
               });
 
-              meow.addScript(compileFunction(prefix, bit));
+              meow.addScript(compileFunction(prefix, bit), sb2context);
             } else {
               die("Unknown bit type "+bit[0]);
             }

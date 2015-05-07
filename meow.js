@@ -76,6 +76,8 @@ Meow.prototype.upload = function(projectID, version, csrf, sessionsid) {
 Meow.prototype.addScript = function(blocks, context) {
 	var tuple = new ScriptTuple(blocks, 0, 0);
 
+	console.log("S: "+context);
+
 	if(context == "Stage" || !context)
 		this.scripts.push(tuple);
 	else
