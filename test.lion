@@ -2,6 +2,10 @@ class Sprite {
   void playSound(string sound) {
     __asm__("[\"playSound:\", [\"getParam\", \"sound\"]]");
   };
+
+  void nextCostume() {
+    __asm__("[\"nextCostume\"]");
+  };
 }
 
 class Cat : Sprite {
@@ -9,6 +13,7 @@ class Cat : Sprite {
   int catType;
 
   void meow() {
+    nextCostume();
     playSound("meow");
   };
 

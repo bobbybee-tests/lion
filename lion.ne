@@ -78,7 +78,7 @@ FunctionBody -> Block {% id %}
 
 Block -> _ |
         BlockLine |
-        Block BlockLine
+        Block BlockLine {% dsconcat %}
 
 BlockLine -> Declaration _ {% id %}
             | FunctionCall ";" _ {% id %}

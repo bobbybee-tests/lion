@@ -124,6 +124,7 @@ function compileBody(body, currentClass) {
       } else if(line[0] == "asm") {
         output.push(JSON.parse(line[1]));
       } else {
+        console.log(line);
         die("Unknown body line type "+line[0]);
       }
     }
