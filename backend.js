@@ -186,6 +186,11 @@ function compileFunctionCall(prefix, call) {
       searchClass = classToSearch;
   }
 
+  // fix small bug when there is no parameters
+  if(call[2][0] == null) {
+    call[2] = [];
+  }
+  
   var blockSpec = calcBlockSpec(blockName, call[1], call[2].length);
 
   return ["call", blockSpec].concat(call[2]);
