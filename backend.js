@@ -17,6 +17,11 @@ module.exports = function(meow, ast) {
       // TODO: functions, short + long
 
       var propertyList = [];
+      var prefix = {
+        className: global[1],
+        inheritance: global[2],
+        functionDefs: [],
+      }
 
       global[3].forEach(function(bit) {
           if(bit) {
@@ -28,7 +33,17 @@ module.exports = function(meow, ast) {
               // TODO: implement
               console.log(bit);
             } else if(bit[0] == "function") {
-              meow.addScript(compileFunction(global[1], bit));
+              prefix.functionDefs.push({
+                name: bit[2],
+                return: bit[1]
+              });
+
+              propertyList.push({
+                name: bit[2],
+                return: bit[1]
+              });
+
+              meow.addScript(compileFunction(prefix, bit));
             } else {
               die("Unknown bit type "+bit[0]);
             }
@@ -71,7 +86,7 @@ function compileFunction(prefix, functionSpec) {
   // TODO: parameters to functions
   // TODO: mangling names
 
-  var blockSpec = prefix + "::" + functionSpec[2];
+  var blockSpec = prefix.className + "::" + functionSpec[2];
   var paramNames = [];
   var defaults = [];
 
@@ -127,7 +142,50 @@ function compileFunctionCall(prefix, call) {
   // TODO: implement function calls
   // atm, this breaks for nonatomic types, return values, etc.
 
-  var blockSpec = calcBlockSpec(prefix, call[1], call[2].length);
+  console.log("Function Call: ");
+  console.log(classLookup);
+  console.log(call);
+  console.log(prefix);
+
+  // find the nearest class that owns us
+  var blockName = call[1];
+  var searching = true;
+
+  for(var j = 0; j < prefix.functionDefs.length; ++j) {
+    if(prefix.functionDefs[j].name == call[1]) {
+      blockName = prefix.className;
+      searching = false;
+      break;
+    }
+  }
+
+  var searchClass = prefix;
+
+  while(searching) {
+      var searcher;
+
+      if(searchClass.inheritance) {
+        searcher = searchClass.inheritance;
+      } else {
+        searching = false;
+        console.error("Cannot find inheritable path for "+call);
+        break;
+      }
+
+      var classToSearch = classLookup[searcher];
+
+      for(var i = 0; i < classToSearch.properties.length; ++i) {
+        if(classToSearch.properties[i].name == call[1]) {
+          blockName = searcher;
+          searching = false;
+          break;
+        }
+      }
+
+      searchClass = classToSearch;
+  }
+
+  var blockSpec = calcBlockSpec(blockName, call[1], call[2].length);
 
   return ["call", blockSpec].concat(call[2]);
 }
