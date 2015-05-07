@@ -19,4 +19,6 @@ parser.feed(fs.readFileSync(process.argv[2]).toString());
 
 backend(meow, parser.results[0]);
 
+meow.addSprite("Cat");
+
 meow.upload(process.argv[3], 'v426', process.argv[4], process.argv[5]);

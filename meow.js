@@ -9,6 +9,8 @@ function Meow() {
 	this.scripts = [];
 	this.lists = [];
 	this.variables = [];
+	this.sprites = [];
+	this.spriteKeys = {}; // used to index this.sprites
 }
 
 Meow.prototype.serialize = function() {
@@ -31,7 +33,7 @@ Meow.prototype.serialize = function() {
 		    "tempoBPM": 60,
 		    "videoAlpha": 0.5,
 		    "scripts" : this.scripts,
-		    "children": [],
+		    "children": this.sprites,
 		    "info": {
 		        "scriptCount": 0,
 		        "flashVersion": "MAC 11,8,800,94",
@@ -81,6 +83,33 @@ Meow.prototype.addList = function(name) {
 
 Meow.prototype.addVariable = function(name, value) {
 	this.variables.push(new VariableTuple(name, value));
+}
+
+Meow.prototype.addSprite = function(id) {
+	this.spriteKeys[id] = this.sprites.length;
+
+	this.sprites.push({
+		objName: id,
+		scratchX: 0,
+		scratchY: 0,
+		visible: true,
+		spriteInfo: {},
+		sounds: [],
+		costumes: [{
+                    "costumeName": "costume1",
+                    "baseLayerID": 1,
+                    "baseLayerMD5": "f9a1c175dbe2e5dee472858dd30d16bb.svg",
+                    "bitmapResolution": 1,
+                    "rotationCenterX": 47,
+                    "rotationCenterY": 55
+                }],
+		currentCostumeIndex: 0,
+		isDraggable: false,
+		indexInLibrary: this.spriteKeys[id] + 1,
+		rotationStyle: "normal",
+		direction: 90,
+		scale: 1,
+	});
 }
 
 function ScriptTuple(blocks, x, y) {
